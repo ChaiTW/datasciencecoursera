@@ -25,7 +25,7 @@ xdata_mean_std <- xdata[, grep("-(mean|std)\\(\\)", read.table("features.txt")[,
 names(xdata_mean_std) <- read.table("features.txt")[grep("-(mean|std)\\(\\)", read.table("features.txt")[, 2]), 2] 
 View(xdata_mean_std)
 
-##3. Use descriptive activity names to name the activities in the data set.
+## 3. Use descriptive activity names to name the activities in the data set.
 
 ydata[, 1] <- read.table("activity_labels.txt")[ydata[, 1], 2]
 names(ydata) <- "Activity"
