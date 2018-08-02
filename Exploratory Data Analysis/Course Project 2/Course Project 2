@@ -44,6 +44,9 @@ barplot(
   main="Total PM2.5 Emissions From All US Sources"
 )
 
+#dev.copy(png,"plot1.png")
+#dev.off()
+
 ## Question 2
 
 NEIdataBaltimore<-subset(NEIdata, fips == "24510")
@@ -58,6 +61,9 @@ barplot(
   main="Total PM2.5 Emissions From All Baltimore City Sources"
 )
 
+#dev.copy(png,"plot2.png")
+#dev.off()
+
 ## Question 3
 
 g<-ggplot(aes(x = year, y = Emissions, fill=type), data=NEIdataBaltimore)
@@ -66,6 +72,9 @@ g+geom_bar(stat="identity")+
   labs(x="year", y=expression("Total PM"[2.5]*" Emission (Tons)")) + 
   labs(title=expression("PM"[2.5]*" Emissions, Baltimore City 1999-2008 by Source Type"))+
   guides(fill=FALSE)
+  
+#dev.copy(png,"plot3.png")
+#dev.off()
 
 ## Question 4
 
@@ -85,6 +94,9 @@ g+geom_bar(stat="identity",fill="grey",width=0.75) +
   guides(fill=FALSE) +
   labs(x="year", y=expression("Total PM"[2.5]*" Emission (10^5 Tons)")) + 
   labs(title=expression("PM"[2.5]*" Coal Combustion Source Emissions Across US from 1999-2008"))
+  
+#dev.copy(png,"plot4.png")
+#dev.off()
 
 ## Question 5
 
@@ -101,6 +113,9 @@ g+geom_bar(stat="identity",fill="grey",width=0.75) +
   guides(fill=FALSE) +
   labs(x="year", y=expression("Total PM"[2.5]*" Emission (10^5 Tons)")) + 
   labs(title=expression("PM"[2.5]*" Motor Vehicle Source Emissions in Baltimore from 1999-2008"))
+  
+#dev.copy(png,"plot5.png")
+#dev.off()
 
 ## Question 6
 
@@ -110,12 +125,15 @@ NEIvehiclela<-subset(NEIvehicleSSC, fips == "06037")
 NEIvehiclela$city <- "Los Angeles County"
 NEIBothCity <- rbind(NEIvehicleBalti, NEIvehiclela)
 
- ggplot(NEIBothCity, aes(x=year, y=Emissions, fill=city)) +
- geom_bar(aes(fill=year),stat="identity") +
- facet_grid(.~city) +
- guides(fill=FALSE) + theme_bw() +
- labs(x="year", y=expression("Total PM"[2.5]*" Emission (Kilo-Tons)")) + 
- labs(title=expression("PM"[2.5]*" Motor Vehicle Source Emissions in Baltimore & LA, 1999-2008"))
+ggplot(NEIBothCity, aes(x=year, y=Emissions, fill=city)) +
+geom_bar(aes(fill=year),stat="identity") +
+facet_grid(.~city) +
+guides(fill=FALSE) + theme_bw() +
+labs(x="year", y=expression("Total PM"[2.5]*" Emission (Kilo-Tons)")) + 
+labs(title=expression("PM"[2.5]*" Motor Vehicle Source Emissions in Baltimore & LA, 1999-2008"))
  
- aggregateEmissions <- aggregate(Emissions~city+year, data=NEIBothCity, sum)
+aggregateEmissions <- aggregate(Emissions~city+year, data=NEIBothCity, sum)
 aggregate(Emissions~city, data=aggregateEmissions, range)
+
+#dev.copy(png,"plot6.png")
+#dev.off()
