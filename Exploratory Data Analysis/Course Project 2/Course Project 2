@@ -21,6 +21,7 @@ library(ggplot2)
 library(plyr)
 
 ## Converting "year", "type", "Pollutant", "SCC", "fips" to factor
+
 colToFactor <- c("year", "type", "Pollutant","SCC","fips")
 NEI[,colToFactor] <- lapply(NEI[,colToFactor], factor)
 
@@ -33,15 +34,13 @@ colSums(is.na(NEIdata))
 
 ## Question 1
 
-totalEmission <- aggregate(Emissions ~ year, NEIdata, sum)
-totalEmission
+## te for total Emissions
+
+te <- aggregate(Emissions ~ year, NEIdata, sum)
 
 barplot(
-  (totalEmission$Emissions)/10^6,
-  names.arg=totalEmission$year,
-  xlab="Year",
-  ylab="PM2.5 Emissions (10^6 Tons)",
-  main="Total PM2.5 Emissions From All US Sources"
+  (te$Emissions)/10^6, names.arg=te$year, xlab="Year", 
+   ylab="PM2.5 Emissions (million Tons)", main="Total PM2.5 Emissions From All US Sources"
 )
 
 #dev.copy(png,"plot1.png")
@@ -49,16 +48,15 @@ barplot(
 
 ## Question 2
 
-NEIdataBaltimore<-subset(NEIdata, fips == "24510")
-totalEmissionBaltimore <- aggregate(Emissions ~ year, NEIdataBaltimore, sum)
-totalEmissionBaltimore
+## nbc for NEIdata of Baltimore
+## tebc for totalEmission of Baltimore
+
+nbc<-subset(NEIdata, fips == "24510")
+tebc <- aggregate(Emissions ~ year, nbc, sum)
 
 barplot(
-  (totalEmissionBaltimore$Emissions)/10^6,
-  names.arg=totalEmissionBaltimore$year,
-  xlab="Year",
-  ylab="PM2.5 Emissions (10^6 Tons)",
-  main="Total PM2.5 Emissions From All Baltimore City Sources"
+  (tebc$Emissions)/10^6, names.arg=tebc$year, xlab="Year",
+  ylab="PM2.5 Emissions (million Tons)", main="Total PM2.5 Emissions From All Baltimore City Sources"
 )
 
 #dev.copy(png,"plot2.png")
@@ -66,12 +64,9 @@ barplot(
 
 ## Question 3
 
-g<-ggplot(aes(x = year, y = Emissions, fill=type), data=NEIdataBaltimore)
-g+geom_bar(stat="identity")+
-  facet_grid(.~type)+
-  labs(x="year", y=expression("Total PM"[2.5]*" Emission (Tons)")) + 
-  labs(title=expression("PM"[2.5]*" Emissions, Baltimore City 1999-2008 by Source Type"))+
-  guides(fill=FALSE)
+g<-ggplot(aes(x = year, y = Emissions, fill=type), data=nbc)
+g+geom_bar(stat="identity")+ facet_grid(.~type)+ labs(x="year", y=expression("Total PM"[2.5]*" Emission (Tons)"))+
+  labs(title=expression("PM"[2.5]*" Emissions, Baltimore City 1999-2008 by Source Type"))+ guides(fill=FALSE)
   
 #dev.copy(png,"plot3.png")
 #dev.off()
@@ -79,19 +74,20 @@ g+geom_bar(stat="identity")+
 ## Question 4
 
 ## making the names in the SCC dataframe pretty by removing \\. in all the names
+
 names(SCC)<-gsub("\\.","", names(SCC))
 
 SCCcombustion<-grepl(pattern = "comb", SCC$SCCLevelOne, ignore.case = TRUE)
 SCCCoal<-grepl(pattern = "coal", SCC$SCCLevelFour, ignore.case = TRUE)
 
 ## extracting the SCC in 
+
 SCCCoalCombustionSCC<-SCC[SCCcombustion & SCCCoal,]$SCC
 NIECoalCombustionValues<-NEIdata[NEIdata$SCC %in% SCCCoalCombustionSCC,]
 NIECoalCombustionTotalEm<-aggregate(Emissions~year, NIECoalCombustionValues, sum)
 
 g<-ggplot(aes(year, Emissions/10^5), data=NIECoalCombustionTotalEm)
-g+geom_bar(stat="identity",fill="grey",width=0.75) +
-  guides(fill=FALSE) +
+g+geom_bar(stat="identity",fill="grey",width=0.75) + guides(fill=FALSE) +
   labs(x="year", y=expression("Total PM"[2.5]*" Emission (10^5 Tons)")) + 
   labs(title=expression("PM"[2.5]*" Coal Combustion Source Emissions Across US from 1999-2008"))
   
@@ -104,14 +100,15 @@ SCCvehicle<-grepl(pattern = "vehicle", SCC$EISector, ignore.case = TRUE)
 SCCvehicleSCC <- SCC[SCCvehicle,]$SCC
 
 ## using this boolean vector get the interested rows from the baltimore data
+
 NEIvehicleSSC <- NEIdata[NEIdata$SCC %in% SCCvehicleSCC, ]
 NEIvehicleBaltimore <- subset(NEIvehicleSSC, fips == "24510")
 NIEvehicleBaltimoreTotEm<-aggregate(Emissions~year, NEIvehicleBaltimore, sum)
 
-g<-ggplot(aes(year, Emissions/10^5), data=NIEvehicleBaltimoreTotEm)
+g<-ggplot(aes(year, Emissions/10^6), data=NIEvehicleBaltimoreTotEm)
 g+geom_bar(stat="identity",fill="grey",width=0.75) +
   guides(fill=FALSE) +
-  labs(x="year", y=expression("Total PM"[2.5]*" Emission (10^5 Tons)")) + 
+  labs(x="year", y=expression("Total PM"[2.5]*" Emission (million Tons)")) + 
   labs(title=expression("PM"[2.5]*" Motor Vehicle Source Emissions in Baltimore from 1999-2008"))
   
 #dev.copy(png,"plot5.png")
