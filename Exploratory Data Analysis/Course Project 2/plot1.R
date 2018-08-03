@@ -1,5 +1,7 @@
 ## Question 1
 
+## te for total Emissions
+
 te <- aggregate(Emissions ~ year, NEIdata, sum)
 
 barplot(
